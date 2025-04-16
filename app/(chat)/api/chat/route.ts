@@ -17,7 +17,6 @@ import {
   generateUUID,
   getMostRecentUserMessage,
   getTrailingMessageId,
-  dispatchChatCreatedEvent,
 } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
 import { createDocument } from '@/lib/ai/tools/create-document';
@@ -67,8 +66,6 @@ export async function POST(request: Request) {
         modelId: selectedChatModel 
       });
       
-      // Dispatch event for new chat creation to refresh history
-      dispatchChatCreatedEvent(selectedChatModel);
     } else {
       if (chat.userId !== session.user.id) {
         return new Response('Unauthorized', { status: 401 });
