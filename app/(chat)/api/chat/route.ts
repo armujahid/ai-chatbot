@@ -17,6 +17,7 @@ import {
   generateUUID,
   getMostRecentUserMessage,
   getTrailingMessageId,
+  dispatchChatCreatedEvent,
 } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
 import { createDocument } from '@/lib/ai/tools/create-document';
@@ -65,6 +66,9 @@ export async function POST(request: Request) {
         title,
         modelId: selectedChatModel 
       });
+      
+      // Dispatch event for new chat creation to refresh history
+      dispatchChatCreatedEvent(selectedChatModel);
     } else {
       if (chat.userId !== session.user.id) {
         return new Response('Unauthorized', { status: 401 });
@@ -196,7 +200,6 @@ export async function DELETE(request: Request) {
     return new Response('Chat deleted', { status: 200 });
   } catch (error) {
     return new Response('An error occurred while processing your request!', {
-      status: 500,
-    });
+      status: 500 });
   }
 }

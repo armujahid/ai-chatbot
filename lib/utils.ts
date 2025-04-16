@@ -163,3 +163,18 @@ export function getTrailingMessageId({
 
   return trailingMessage.id;
 }
+
+/**
+ * Dispatch a custom event to notify that a new chat was created
+ * @param modelId - The model ID of the newly created chat
+ */
+export function dispatchChatCreatedEvent(modelId: string) {
+  // Only run in browser environment
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('chat-created', {
+        detail: { modelId }
+      })
+    );
+  }
+}

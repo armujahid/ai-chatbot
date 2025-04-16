@@ -2,7 +2,7 @@
 
 import type { Attachment, UIMessage } from 'ai';
 import { useChat } from '@ai-sdk/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { ChatHeader } from '@/components/chat-header';
 import type { Vote } from '@/lib/db/schema';
@@ -14,7 +14,11 @@ import type { VisibilityType } from './visibility-selector';
 import { useArtifactSelector } from '@/hooks/use-artifact';
 import { toast } from 'sonner';
 import { unstable_serialize } from 'swr/infinite';
-import { getChatHistoryPaginationKey } from './sidebar-history';
+import { 
+  getChatHistoryPaginationKey, 
+  getFirstPageKey, 
+  refreshGlobalChatHistory 
+} from './sidebar-history';
 
 export function Chat({
   id,
@@ -49,6 +53,8 @@ export function Chat({
     sendExtraMessageFields: true,
     generateId: generateUUID,
     onFinish: () => {
+      // Refresh the chat history when chat completes
+      refreshGlobalChatHistory(); // Call global refresh function
       mutate(unstable_serialize(getChatHistoryPaginationKey));
     },
     onError: () => {

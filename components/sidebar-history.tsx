@@ -100,6 +100,22 @@ export function getChatHistoryPaginationKey(
   return modelId ? `${baseUrl}&modelId=${modelId}` : baseUrl;
 }
 
+// Create a function to get the first page key for mutating the cache
+export function getFirstPageKey(modelId?: string) {
+  return modelId 
+    ? `/api/history?limit=${PAGE_SIZE}&modelId=${modelId}`
+    : `/api/history?limit=${PAGE_SIZE}`;
+}
+
+// Create a global handler for chat history refresh
+let globalHistoryRefreshCallback: (() => void) | null = null;
+
+export function refreshGlobalChatHistory() {
+  if (globalHistoryRefreshCallback) {
+    globalHistoryRefreshCallback();
+  }
+}
+
 export function SidebarHistory({ user }: { user: User | undefined }) {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
@@ -206,6 +222,14 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     setIsRefreshing(true);
     mutate().finally(() => setIsRefreshing(false));
   };
+
+  // Register the refresh callback globally
+  useEffect(() => {
+    globalHistoryRefreshCallback = refreshChatHistory;
+    return () => {
+      globalHistoryRefreshCallback = null;
+    };
+  }, []);
 
   useEffect(() => {
     refreshChatHistory();
