@@ -62,10 +62,12 @@ export async function saveChat({
   id,
   userId,
   title,
+  modelId,
 }: {
   id: string;
   userId: string;
   title: string;
+  modelId?: string;
 }) {
   try {
     return await db.insert(chat).values({
@@ -73,6 +75,7 @@ export async function saveChat({
       createdAt: new Date(),
       userId,
       title,
+      modelId,
     });
   } catch (error) {
     console.error('Failed to save chat in database');
@@ -97,26 +100,34 @@ export async function getChatsByUserId({
   limit,
   startingAfter,
   endingBefore,
+  modelId,
 }: {
   id: string;
   limit: number;
   startingAfter: string | null;
   endingBefore: string | null;
+  modelId?: string;
 }) {
   try {
     const extendedLimit = limit + 1;
 
-    const query = (whereCondition?: SQL<any>) =>
-      db
+    const query = (whereCondition?: SQL<any>) => {
+      let conditions = whereCondition
+        ? and(whereCondition, eq(chat.userId, id))
+        : eq(chat.userId, id);
+      
+      // Add model filter if provided
+      if (modelId) {
+        conditions = and(conditions, eq(chat.modelId, modelId));
+      }
+      
+      return db
         .select()
         .from(chat)
-        .where(
-          whereCondition
-            ? and(whereCondition, eq(chat.userId, id))
-            : eq(chat.userId, id),
-        )
+        .where(conditions)
         .orderBy(desc(chat.createdAt))
         .limit(extendedLimit);
+    };
 
     let filteredChats: Array<Chat> = [];
 
@@ -232,7 +243,7 @@ export async function getVotesByChatId({ id }: { id: string }) {
   try {
     return await db.select().from(vote).where(eq(vote.chatId, id));
   } catch (error) {
-    console.error('Failed to get votes by chat id from database', error);
+    console.error('Failed to get votes by chat id from database');
     throw error;
   }
 }

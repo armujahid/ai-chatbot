@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   const limit = parseInt(searchParams.get('limit') || '10');
   const startingAfter = searchParams.get('starting_after');
   const endingBefore = searchParams.get('ending_before');
+  const modelId = searchParams.get('modelId');
 
   if (startingAfter && endingBefore) {
     return Response.json(
@@ -28,6 +29,7 @@ export async function GET(request: NextRequest) {
       limit,
       startingAfter,
       endingBefore,
+      modelId: modelId || undefined,
     });
 
     return Response.json(chats);

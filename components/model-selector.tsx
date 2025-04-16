@@ -1,6 +1,6 @@
 'use client';
 
-import { startTransition, useMemo, useOptimistic, useState } from 'react';
+import { startTransition, useMemo, useOptimistic, useState, useEffect } from 'react';
 
 import { saveChatModelAsCookie } from '@/app/(chat)/actions';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,18 @@ export function ModelSelector({
     () => chatModels.find((chatModel) => chatModel.id === optimisticModelId),
     [optimisticModelId],
   );
+  
+  // Sync model ID with localStorage when it changes
+  useEffect(() => {
+    if (optimisticModelId) {
+      localStorage.setItem('selectedModelId', optimisticModelId);
+      // Trigger storage event for other components to detect the change
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'selectedModelId',
+        newValue: optimisticModelId
+      }));
+    }
+  }, [optimisticModelId]);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
