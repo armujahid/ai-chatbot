@@ -100,12 +100,6 @@ export function getChatHistoryPaginationKey(
   return modelId ? `${baseUrl}&modelId=${modelId}` : baseUrl;
 }
 
-// Create a function to get the first page key for mutating the cache
-export function getFirstPageKey(modelId?: string) {
-  return modelId 
-    ? `/api/history?limit=${PAGE_SIZE}&modelId=${modelId}`
-    : `/api/history?limit=${PAGE_SIZE}`;
-}
 
 // Create a global handler for chat history refresh
 let globalHistoryRefreshCallback: (() => void) | null = null;

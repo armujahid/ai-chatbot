@@ -16,7 +16,6 @@ import { toast } from 'sonner';
 import { unstable_serialize } from 'swr/infinite';
 import { 
   getChatHistoryPaginationKey, 
-  getFirstPageKey, 
   refreshGlobalChatHistory 
 } from './sidebar-history';
 
